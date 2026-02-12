@@ -1,5 +1,5 @@
 // ===== TAUSUG TRANSLATOR v2.0 =====
-// ===== COMPLETE & WORKING VERSION =====
+// ===== PRODUCTION READY – COMPLETE & CORRECTED =====
 
 // ===== GLOBAL VARIABLES =====
 let dictionary = JSON.parse(localStorage.getItem('tausugDictionary')) || {
@@ -17,6 +17,7 @@ let dictionary = JSON.parse(localStorage.getItem('tausugDictionary')) || {
 
 let recentTranslations = JSON.parse(localStorage.getItem('recentTranslations')) || [];
 let sentenceDatabase = {};
+let communityWordCount = 0; // Track words loaded from GitHub
 
 // ===== LOAD SENTENCES =====
 async function loadSentencesFromGitHub() {
@@ -45,25 +46,15 @@ function saveRecentTranslations() {
 function updateStats() {
     const statsDiv = document.getElementById('dictionaryStats');
     if (!statsDiv) return;
-    
-    // Count words from community dictionary (JSON) + user dictionary
-    let communityCount = 0;
-    if (window.communityDictionaryCount) {
-        communityCount = window.communityDictionaryCount;
-    } else {
-        // Count from your dictionary.json structure
-        const jsonDict = dictionary; // Your merged dictionary
-        communityCount = Object.keys(dictionary).length;
-    }
-    
-    const userCount = Object.keys(dictionary).length - communityCount;
+
     const totalCount = Object.keys(dictionary).length;
-    
+    const userCount = totalCount - communityWordCount;
+
     statsDiv.innerHTML = `
         <div class="stat-card">
             <div class="stat-category">📚 Total Words</div>
             <div class="stat-count">${totalCount}</div>
-            <div class="stat-example">Community: 87 • User: ${userCount > 0 ? userCount : 0}</div>
+            <div class="stat-example">Community: ${communityWordCount} • User: ${userCount}</div>
             <div class="stat-example">Last updated: ${new Date().toLocaleDateString()}</div>
         </div>
     `;
@@ -75,25 +66,42 @@ function addWordToDictionary(tausug, english) {
     return true;
 }
 
-// ===== LOAD FROM GITHUB =====
+// ===== LOAD FROM GITHUB – FULL CATEGORY SUPPORT =====
 async function loadDictionaryFromGitHub() {
     try {
         const response = await fetch('json/dictionary.json');
         if (!response.ok) throw new Error(`Failed: ${response.status}`);
         const data = await response.json();
-        
+
         let combinedDict = {};
+
+        // Load ALL categories from your dictionary.json
         if (data.nouns) combinedDict = { ...combinedDict, ...data.nouns };
         if (data.verbs) combinedDict = { ...combinedDict, ...data.verbs };
         if (data.adjectives) combinedDict = { ...combinedDict, ...data.adjectives };
-        
+        if (data.pronouns) combinedDict = { ...combinedDict, ...data.pronouns };
+        if (data.numbers) combinedDict = { ...combinedDict, ...data.numbers };
+        if (data.phrases) combinedDict = { ...combinedDict, ...data.phrases };
+
+        // Also include any other custom categories
+        for (const key in data) {
+            if (!['metadata', 'nouns', 'verbs', 'adjectives', 'pronouns', 'numbers', 'phrases'].includes(key) && 
+                typeof data[key] === 'object') {
+                combinedDict = { ...combinedDict, ...data[key] };
+            }
+        }
+
         if (Object.keys(combinedDict).length > 0) {
-            dictionary = { ...combinedDict, ...dictionary };
+            communityWordCount = Object.keys(combinedDict).length; // Store community word count
+            dictionary = { ...combinedDict, ...dictionary }; // Merge, user words take precedence
             saveDictionary();
-            updateStatus(`Loaded ${Object.keys(combinedDict).length} words!`, 'success');
+            updateStatus(`✅ Loaded ${communityWordCount} community words!`, 'success');
+        } else {
+            updateStatus('ℹ️ No new words found', 'info');
         }
     } catch (error) {
-        console.log('⚠️ Using local dictionary only');
+        console.log('⚠️ Using local dictionary only', error.message);
+        updateStatus('Using personal dictionary', 'info');
     }
 }
 
@@ -121,7 +129,7 @@ function exportForGitHub() {
     link.href = dataUri;
     link.download = `tausug-dictionary-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
-    updateStatus(`Dictionary exported`, 'success');
+    updateStatus(`📤 Dictionary exported for GitHub`, 'success');
 }
 
 // ===== TRANSLATE =====
@@ -201,7 +209,7 @@ function updateRecentTranslationsUI() {
     container.innerHTML = html;
 }
 
-// ===== SENTENCES =====
+// ===== SENTENCES – WITH PRONUNCIATION DISPLAY =====
 function showExampleSentences(word) {
     const popup = document.getElementById('sentencesPopup');
     const overlay = document.getElementById('sentencesOverlay');
@@ -216,8 +224,11 @@ function showExampleSentences(word) {
         sentenceDatabase[word].forEach((s, i) => {
             html += `<div class="sentence-item">
                 <div class="sentence-tausug"><strong>${i+1}.</strong> ${s.tausug}</div>
-                <div class="sentence-english"><strong>English:</strong> ${s.english}</div>
-            </div>`;
+                <div class="sentence-english"><strong>English:</strong> ${s.english}</div>`;
+            if (s.pronunciation) {
+                html += `<div class="sentence-pronunciation"><strong>Pronunciation:</strong> ${s.pronunciation}</div>`;
+            }
+            html += `</div>`;
         });
         html += '</div>';
         content.innerHTML = html;
@@ -246,22 +257,31 @@ function exportDictionary() {
     link.href = dataUri;
     link.download = `tausug-dictionary-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
-    updateStatus(`Dictionary exported (${Object.keys(dictionary).length} words)`, 'success');
+    updateStatus(`📥 Dictionary exported (${Object.keys(dictionary).length} words)`, 'success');
 }
 
-// ===== EXPORT SORTED =====
+// ===== EXPORT SORTED – WITH METADATA =====
 function exportDictionarySorted() {
     const sortedDict = {};
     Object.keys(dictionary).sort().forEach(key => {
         sortedDict[key] = dictionary[key];
     });
-    const dataStr = JSON.stringify(sortedDict, null, 2);
+    const data = {
+        metadata: {
+            exported: new Date().toISOString(),
+            totalWords: Object.keys(dictionary).length,
+            sorted: true,
+            source: "Tausug Translator"
+        },
+        dictionary: sortedDict
+    };
+    const dataStr = JSON.stringify(data, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const link = document.createElement('a');
     link.href = dataUri;
     link.download = `tausug-dictionary-sorted-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
-    updateStatus(`Dictionary exported (${Object.keys(dictionary).length} words, alphabetical)`, 'success');
+    updateStatus(`📥 Dictionary exported (${Object.keys(dictionary).length} words, alphabetical)`, 'success');
 }
 
 // ===== IMPORT =====
@@ -277,10 +297,10 @@ function importDictionary(event) {
             if (typeof importedDict === 'object') {
                 dictionary = { ...dictionary, ...importedDict };
                 saveDictionary();
-                updateStatus(`Imported ${Object.keys(importedDict).length} new words!`, 'success');
+                updateStatus(`📥 Imported ${Object.keys(importedDict).length} new words!`, 'success');
             }
         } catch (error) {
-            updateStatus('Error: Invalid JSON format', 'error');
+            updateStatus('❌ Error: Invalid JSON format', 'error');
         }
     };
     reader.readAsText(file);
@@ -306,15 +326,21 @@ function updateStatus(message, type = 'info') {
     }
 }
 
-// ===== RESET =====
+// ===== RESET – SAFE VERSION (KEEPS COMMUNITY WORDS) =====
+async function resetToCommunityDictionary() {
+    if (confirm('⚠️ This will remove ALL words you added and restore the official community dictionary. Continue?')) {
+        await loadDictionaryFromGitHub(); // Reload fresh community dict (this already merges, but we want to reset)
+        // To truly reset: clear localStorage for dictionary, then reload from GitHub
+        localStorage.removeItem('tausugDictionary');
+        dictionary = {}; // Clear
+        await loadDictionaryFromGitHub(); // Reload fresh
+        updateStatus('✅ Reset to community dictionary', 'success');
+    }
+}
+
+// For backward compatibility, you can keep the old function name but redirect
 function resetToDefaultDictionary() {
-    dictionary = {
-        "bay": "house", "kaun": "eat", "inum": "drink", "tāu": "person",
-        "iskul": "school", "tug": "sleep", "bassa'": "read",
-        "dakula'": "big", "asibi'": "small", "maisug": "brave"
-    };
-    saveDictionary();
-    updateStatus('Reset to default dictionary', 'success');
+    resetToCommunityDictionary();
 }
 
 // ===== INITIALIZATION =====
@@ -566,5 +592,5 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     console.log('✅ Tausug Translator ready!');
-    console.log(`📚 Dictionary: ${Object.keys(dictionary).length} words`);
+    console.log(`📚 Dictionary: ${Object.keys(dictionary).length} words (Community: ${communityWordCount})`);
 });
