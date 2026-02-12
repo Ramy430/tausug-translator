@@ -45,11 +45,25 @@ function saveRecentTranslations() {
 function updateStats() {
     const statsDiv = document.getElementById('dictionaryStats');
     if (!statsDiv) return;
-    const wordCount = Object.keys(dictionary).length;
+    
+    // Count words from community dictionary (JSON) + user dictionary
+    let communityCount = 0;
+    if (window.communityDictionaryCount) {
+        communityCount = window.communityDictionaryCount;
+    } else {
+        // Count from your dictionary.json structure
+        const jsonDict = dictionary; // Your merged dictionary
+        communityCount = Object.keys(dictionary).length;
+    }
+    
+    const userCount = Object.keys(dictionary).length - communityCount;
+    const totalCount = Object.keys(dictionary).length;
+    
     statsDiv.innerHTML = `
         <div class="stat-card">
-            <div class="stat-category">Total Words</div>
-            <div class="stat-count">${wordCount}</div>
+            <div class="stat-category">📚 Total Words</div>
+            <div class="stat-count">${totalCount}</div>
+            <div class="stat-example">Community: 87 • User: ${userCount > 0 ? userCount : 0}</div>
             <div class="stat-example">Last updated: ${new Date().toLocaleDateString()}</div>
         </div>
     `;
