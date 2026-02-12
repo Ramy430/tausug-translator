@@ -28,14 +28,14 @@ const sentenceDatabase = {
             pronunciation: "[ma-ling-KAT in BAY ni-LA]"
         },
         {
-            tausug: "Magsawa kami ha bay.",
+            tausug: "Magtipun kami ha bay.",
             english: "We will gather at the house.",
             pronunciation: "[mag-SA-wa KA-mi ha BAY]"
         }
     ],
     "kaun": [
         {
-            tausug: "Kaun na kita.",
+            tausug: "Kumaun na kita.",
             english: "Let's eat now.",
             pronunciation: "[ka-UN na KI-ta]"
         }
@@ -47,9 +47,9 @@ const sentenceDatabase = {
             pronunciation: "[i-NUM kaw TI-big]"
         },
         {
-            tausug: "Biyu inum kaw kape?",
+            tausug: "Mabayah kaw minum kahawa?",
             english: "Do you want to drink coffee?",
-            pronunciation: "[bi-YU i-NUM kaw KA-pe]"
+            pronunciation: "[mi-NUM kaw KA-hawa]"
         }
     ],
     "iskul": [
@@ -68,9 +68,9 @@ const sentenceDatabase = {
     ],
     "bassa'": [
         {
-            tausug: "Bassa' kaw libru.",
+            tausug: "Bassa' kaw kitab.",
             english: "Read a book.",
-            pronunciation: "[bas-SA' kaw LIB-ru]"
+            pronunciation: "[bas-SA' kaw Ki-TA-b]"
         }
     ],
     "dakula'": [
@@ -82,16 +82,16 @@ const sentenceDatabase = {
     ],
     "asibi'": [
         {
-            tausug: "Asibi' in kutu yaun.",
+            tausug: "Asibi' in kuting yaun.",
             english: "That cat is small.",
-            pronunciation: "[a-si-BI' in KU-tu YA-un]"
+            pronunciation: "[a-si-BI' in KU-ting YA-un]"
         }
     ],
     "magsukul": [
         {
-            tausug: "Magsukul karun.",
+            tausug: "Magsukul kaymo biyhayaun.",
             english: "Thank you now.",
-            pronunciation: "[mag-SU-kul KA-run]"
+            pronunciation: "[mag-SU-kul kaym-mo bi-HA-ya-un]"
         }
     ]
 };
