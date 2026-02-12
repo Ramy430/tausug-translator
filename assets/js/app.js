@@ -172,6 +172,13 @@ function exportForGitHub() {
 // ===== TRANSLATION FUNCTIONS =====
 function translateWord(word, fromLang, toLang) {
     if (!word.trim()) return "";
+// Helper function for testing (add this after translateWord)
+function testWord(word) {
+    console.log(`🔍 Testing: "${word}"`);
+    const result = translateWord(word, 'tsg', 'en');
+    console.log(`✅ Result: "${result}"`);
+    return result;
+}
     
     // Store original for return if needed
     const originalWord = word;
