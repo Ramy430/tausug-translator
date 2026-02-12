@@ -374,8 +374,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const downloadJSONBtn = document.getElementById('downloadJSONBtn');
     const viewSourceBtn = document.getElementById('viewSourceBtn');
     const updateSourceBtn = document.getElementById('updateSourceBtn');
-    const dictionaryExportBtn = document.getElementById('dictionaryExportBtn');
-    const dictionaryImportBtn = document.getElementById('dictionaryImportBtn');
     const closeSentencesBtn = document.getElementById('closeSentencesBtn');
     const sentencesOverlay = document.getElementById('sentencesOverlay');
     const inputCharCount = document.getElementById('inputCharCount');
