@@ -24,9 +24,9 @@
     ],
     "kaun": [
       {
-        "tausug": "Kaun na kita.",
+        "tausug": "Kumaun na kita.",
         "english": "Let's eat now.",
-        "pronunciation": "[ka-UN na KI-ta]"
+        "pronunciation": "[kuma-UN na KI-ta]"
       }
     ],
     "inum": [
@@ -34,6 +34,13 @@
         "tausug": "Inum kaw tubig.",
         "english": "Drink water.",
         "pronunciation": "[i-NUM kaw TI-big]"
+      }
+    ],
+    "bassa'": [
+      {
+        "tausug": "Bassa' kaw kitab.",
+        "english": "Read a book.",
+        "pronunciation": "[bas-SA' kaw KI-tab]"
       }
     ]
   }
