@@ -266,13 +266,7 @@ h1 { color: var(--primary-dark); }
     .action-btn { flex: 1; justify-content: center; }
 }
 /* ===== FIX CHARACTER COUNTER OVERLAP ===== */
-.output-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
+
 
 .char-count {
     position: static !important;  /* Remove absolute positioning */
