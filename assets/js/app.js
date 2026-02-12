@@ -19,82 +19,26 @@ let dictionary = JSON.parse(localStorage.getItem('tausugDictionary')) || {
 
 let recentTranslations = JSON.parse(localStorage.getItem('recentTranslations')) || [];
 
-// ===== SENTENCES DATABASE =====
-const sentenceDatabase = {
-    "bay": [
-        {
-            tausug: "Malingkat in bay nila.",
-            english: "Their house is beautiful.",
-            pronunciation: "[ma-ling-KAT in BAY ni-LA]"
-        },
-        {
-            tausug: "Magtipun kami ha bay.",
-            english: "We will gather at the house.",
-            pronunciation: "[mag-SA-wa KA-mi ha BAY]"
+// ===== SENTENCES DATABASE - LOADED FROM JSON =====
+let sentenceDatabase = {};
+
+// ===== SENTENCES LOADING FUNCTION =====
+async function loadSentencesFromGitHub() {
+    try {
+        const response = await fetch('json/sentences.json');
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load sentences: ${response.status}`);
         }
-    ],
-    "kaun": [
-        {
-            tausug: "Kumaun na kita.",
-            english: "Let's eat now.",
-            pronunciation: "[ka-UN na KI-ta]"
-        }
-    ],
-    "inum": [
-        {
-            tausug: "Inum kaw tubig.",
-            english: "Drink water.",
-            pronunciation: "[i-NUM kaw TI-big]"
-        },
-        {
-            tausug: "Mabayah kaw minum kahawa?",
-            english: "Do you want to drink coffee?",
-            pronunciation: "[mi-NUM kaw KA-hawa]"
-        }
-    ],
-    "iskul": [
-        {
-            tausug: "Madtu aku pa iskul kunsum.",
-            english: "I will go to school tomorrow.",
-            pronunciation: "[mad-TU a-KU pa is-KUL KUN-sum]"
-        }
-    ],
-    "tāu": [
-        {
-            tausug: "Marayaw in tāu yaun.",
-            english: "That person is kind.",
-            pronunciation: "[ma-ra-yaw in TA-u YA-un]"
-        }
-    ],
-    "bassa'": [
-        {
-            tausug: "Bassa' kaw kitab.",
-            english: "Read a book.",
-            pronunciation: "[bas-SA' kaw Ki-TA-b]"
-        }
-    ],
-    "dakula'": [
-        {
-            tausug: "Dakula' in bay nila.",
-            english: "Their house is big.",
-            pronunciation: "[da-ku-LA' in BAY ni-LA]"
-        }
-    ],
-    "asibi'": [
-        {
-            tausug: "Asibi' in kuting yaun.",
-            english: "That cat is small.",
-            pronunciation: "[a-si-BI' in KU-ting YA-un]"
-        }
-    ],
-    "magsukul": [
-        {
-            tausug: "Magsukul kaymo biyhayaun.",
-            english: "Thank you now.",
-            pronunciation: "[mag-SU-kul kaym-mo bi-HA-ya-un]"
-        }
-    ]
-};
+        
+        const data = await response.json();
+        sentenceDatabase = data.sentences || {};
+        console.log(`✅ Loaded example sentences for ${Object.keys(sentenceDatabase).length} words`);
+    } catch (error) {
+        console.log('⚠️ Could not load sentences. Using empty database.', error.message);
+        sentenceDatabase = {};
+    }
+}
 
 // ===== DICTIONARY FUNCTIONS =====
 function saveDictionary() {
@@ -341,7 +285,7 @@ function showExampleSentences(word) {
     word = word.toLowerCase().trim();
     content.innerHTML = '';
     
-    if (sentenceDatabase[word]) {
+    if (sentenceDatabase[word] && sentenceDatabase[word].length > 0) {
         const sentencesList = document.createElement('div');
         sentencesList.className = 'sentences-list';
         
@@ -467,6 +411,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Load community dictionary from GitHub
     await loadDictionaryFromGitHub();
     console.log(`✅ Dictionary ready: ${Object.keys(dictionary).length} words`);
+    
+    // Load sentences from GitHub
+    await loadSentencesFromGitHub();
     
     // Initialize UI
     updateStats();
@@ -784,4 +731,5 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     console.log('✅ Tausug Translator v2.0 ready!');
     console.log(`📚 Dictionary: ${Object.keys(dictionary).length} words`);
+    console.log(`📖 Sentences: ${Object.keys(sentenceDatabase).length} words have examples`);
 });
