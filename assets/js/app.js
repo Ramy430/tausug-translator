@@ -173,12 +173,19 @@ function exportForGitHub() {
 function translateWord(word, fromLang, toLang) {
     if (!word.trim()) return "";
     
+    // Store original for return if needed
+    const originalWord = word;
     word = word.toLowerCase().trim();
+    
+    // PRESERVE apostrophes - only remove ending punctuation for lookup
+    // This keeps the apostrophe in the word but also tries without trailing punctuation
+    const cleanWord = word.replace(/[.,!?;:]$/, ''); // REMOVED apostrophe from this regex!
     
     let actualFromLang = fromLang;
     
     // Auto-detect language
     if (fromLang === 'auto') {
+        // Check dictionary with original word (preserves apostrophe)
         if (dictionary[word]) {
             actualFromLang = 'tsg';
         } else {
@@ -189,17 +196,25 @@ function translateWord(word, fromLang, toLang) {
         }
     }
     
-    // Translate
+    // Translate Tausug → English
     if (actualFromLang === 'tsg' && toLang === 'en') {
-        return dictionary[word] || "Word not found in dictionary";
-    } else if (actualFromLang === 'en' && toLang === 'tsg') {
+        // Priority: 
+        // 1. Exact match (with apostrophe)
+        // 2. Match without trailing punctuation (but still with apostrophe)
+        return dictionary[word] || dictionary[cleanWord] || "Word not found in dictionary";
+    }
+    
+    // Translate English → Tausug
+    else if (actualFromLang === 'en' && toLang === 'tsg') {
         for (let [tausug, english] of Object.entries(dictionary)) {
-            if (english.toLowerCase() === word) return tausug;
+            if (english.toLowerCase() === word) {
+                return tausug;
+            }
         }
         return "Word not found in dictionary";
     }
     
-    return word;
+    return originalWord;
 }
 
 function speakText(text, language) {
