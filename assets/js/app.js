@@ -387,17 +387,66 @@ function exportDictionarySorted() {
     updateStatus(`Dictionary exported (${Object.keys(dictionary).length} words, alphabetical)`, 'success');
 }
 
-function importDictionary(event) {
-    // ... your existing import code (DO NOT CHANGE) ...
+// ===== EXPORT/IMPORT FUNCTIONS =====
+function exportDictionary() {
+    const dataStr = JSON.stringify(dictionary, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', dataUri);
+    link.setAttribute('download', `tausug-dictionary-${new Date().toISOString().split('T')[0]}.json`);
+    link.click();
+    
+    updateStatus(`Dictionary exported (${Object.keys(dictionary).length} words)`, 'success');
 }
 
-    {
+// ===== EXPORT WITH ALPHABETICAL ORDER =====
+function exportDictionarySorted() {
+    // Create a new object with sorted keys
+    const sortedDict = {};
+    Object.keys(dictionary).sort().forEach(key => {
+        sortedDict[key] = dictionary[key];
+    });
+    
+    const dataStr = JSON.stringify(sortedDict, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', dataUri);
+    link.setAttribute('download', `tausug-dictionary-sorted-${new Date().toISOString().split('T')[0]}.json`);
+    link.click();
+    
+    updateStatus(`Dictionary exported (${Object.keys(dictionary).length} words, alphabetical)`, 'success');
+}
+
+function importDictionary(event) {
     const file = event.target.files[0];
     if (!file) return;
     
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
+            let importedDict = JSON.parse(e.target.result);
+            
+            // Handle different JSON structures
+            if (importedDict.dictionary) {
+                importedDict = importedDict.dictionary;
+            }
+            
+            if (typeof importedDict === 'object') {
+                const wordCount = Object.keys(importedDict).length;
+                dictionary = { ...dictionary, ...importedDict };
+                saveDictionary();
+                updateStatus(`Imported ${wordCount} new words!`, 'success');
+            }
+        } catch (error) {
+            updateStatus('Error: Invalid JSON format', 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+{
             let importedDict = JSON.parse(e.target.result);
             
             // Handle different JSON structures
