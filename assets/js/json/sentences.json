@@ -1,1 +1,40 @@
-
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Tausug Example Sentences",
+    "lastUpdated": "2024-02-12"
+  },
+  "sentences": {
+    "bay": [
+      {
+        "tausug": "Malingkat in bay nila.",
+        "english": "Their house is beautiful.",
+        "pronunciation": "[ma-ling-KAT in BAY ni-LA]"
+      },
+      {
+        "tausug": "Magtipun kami ha bay.",
+        "english": "We will gather at the house.",
+        "pronunciation": "[mag-TI-pun KA-mi ha BAY]"
+      },
+      {
+        "tausug": "Kabaakan siya ha bay sin doktor.",
+        "english": "It is located at the doctor's house.",
+        "pronunciation": "[ka-ba-AK-an si-YA ha BAY sin dok-TOR]"
+      }
+    ],
+    "kaun": [
+      {
+        "tausug": "Kaun na kita.",
+        "english": "Let's eat now.",
+        "pronunciation": "[ka-UN na KI-ta]"
+      }
+    ],
+    "inum": [
+      {
+        "tausug": "Inum kaw tubig.",
+        "english": "Drink water.",
+        "pronunciation": "[i-NUM kaw TI-big]"
+      }
+    ]
+  }
+}
