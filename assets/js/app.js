@@ -536,19 +536,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     // Download JSON (same as export)
-    if (downloadJSONBtn) downloadJSONBtn.addEventListener('click', exportDictionary);
-    if (dictionaryExportBtn) dictionaryExportBtn.addEventListener('click', exportDictionary);
     
-    // Dictionary Import
-    if (dictionaryImportBtn) {
-        dictionaryImportBtn.addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json,application/json';
-            input.addEventListener('change', importDictionary);
-            input.click();
-        });
-    }
     
     // View Source
     if (viewSourceBtn) {
